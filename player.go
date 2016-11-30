@@ -7,6 +7,8 @@ import (
 	"sync"
 )
 
+//go:generate counterfeiter . Messenger
+
 // ensure remotePlayer satisfies Player.
 var _ Player = &remotePlayer{}
 
@@ -24,8 +26,18 @@ type number struct {
 	Number string `json:"number"`
 }
 
+// Messenger sends, receives and acts on messages.
+type Messenger interface {
+	// ID is the messenger's id.
+	ID() string
+	// OnMessage registers an action for a message of a kind.
+	OnMessage(kind string, action func(data string))
+	// SendMessage sends a message of a kind.
+	SendMessage(kind string, data string) error
+}
+
 type remotePlayer struct {
-	c *Client
+	c Messenger
 
 	mu   sync.RWMutex // guards
 	name string
