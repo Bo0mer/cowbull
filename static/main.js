@@ -22,9 +22,15 @@ $(function() {
 
         switch ($('#opponentSelect').val()) {
         case "ai_thinker":
-            playerRole = "guesser"
+            playerRole = "guesser";
             againstAI = true;
             opponents = [];
+            break;
+        case "ai_guesser":
+            playerRole = "thinker";
+            againstAI = true;
+            opponents = [];
+            waitsForThink = true;
             break;
         case "thinker":
             playerRole = "guesser";
