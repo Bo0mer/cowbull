@@ -145,7 +145,11 @@ func (c *Client) Close() error {
 }
 
 func (c *Client) readLoop() {
-	defer c.Close()
+	defer func() {
+		if err := c.Close(); err != nil {
+			c.log.Printf("error closing self: %v\n", err)
+		}
+	}()
 
 	var retries = 0
 	for {
