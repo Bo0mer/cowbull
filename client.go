@@ -124,7 +124,7 @@ func (c *Client) OnMessage(name string, action func(data string)) {
 	c.actions[name] = action
 }
 
-// SendMessages sends message to the client.
+// SendMessage sends message to the client.
 func (c *Client) SendMessage(name, data string) error {
 	return c.conn.WriteJSON(&message{
 		Name: name,
