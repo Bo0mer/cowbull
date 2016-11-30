@@ -68,7 +68,7 @@ func (s *server) upgrade(w http.ResponseWriter, req *http.Request) {
 	}
 
 	c := NewClient(conn)
-	player := RemotePlayer(c)
+	player := NewRemotePlayer(c)
 	c.OnMessage("connect", func(_ string) {
 		s.log.Printf("client connected: %s\n", c.ID())
 		s.hub.Add(player)
