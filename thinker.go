@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// AIThinker is an artificial intelligence that can think of numbers.
 type AIThinker struct {
 	digits int
 	number string
@@ -14,20 +15,27 @@ type AIThinker struct {
 	perm func(int) []int
 }
 
-func LocalThinker(digits int) *AIThinker {
+// LocalThinker creates new AIThinker that thinks only of n-digit numbers.
+func LocalThinker(n int) *AIThinker {
 	return &AIThinker{
-		digits: digits,
+		digits: n,
 		perm:   rand.Perm,
 	}
 }
 
-func NewLocalThinker(digits int, perm func(int) []int) *AIThinker {
+// NewLocalThinker creates new AIThinker that thinks only of n-digit numbers.
+// The perm argument specifies a function that generates permutations in the
+// range [0, n). For more info, see the doc of rand.Perm.
+// This method is used for testing. If you're using it, you're doing something
+// wrong or you're trying to be clever. Remember: clear is better than clever.
+func NewLocalThinker(n int, perm func(int) []int) *AIThinker {
 	return &AIThinker{
-		digits: digits,
+		digits: n,
 		perm:   perm,
 	}
 }
 
+// Think thinks of a number.
 func (p *AIThinker) Think() (int, error) {
 	var err error
 	p.number, err = p.generateNumber()
@@ -37,6 +45,7 @@ func (p *AIThinker) Think() (int, error) {
 	return len(p.number), nil
 }
 
+// Try returns the cows and bulls for number.
 func (p *AIThinker) Try(number string) (int, int, error) {
 	if len(number) != len(p.number) {
 		return 0, 0, errors.New("local player: try number digit count mismatch")
