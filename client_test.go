@@ -7,7 +7,7 @@ import (
 	"time"
 
 	. "github.com/Bo0mer/cowbull"
-	"github.com/Bo0mer/cowbull/fakes"
+	"github.com/Bo0mer/cowbull/cowbullfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,11 +24,11 @@ func (fakeNetAddr) String() string {
 }
 
 var _ = Describe("Client", func() {
-	var conn *fakes.FakeConn
+	var conn *cowbullfakes.FakeConn
 	var c *Client
 
 	BeforeEach(func() {
-		conn = new(fakes.FakeConn)
+		conn = new(cowbullfakes.FakeConn)
 		conn.RemoteAddrReturns(fakeNetAddr{})
 	})
 

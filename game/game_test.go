@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	. "github.com/Bo0mer/cowbull/game"
-	"github.com/Bo0mer/cowbull/game/fakes"
+	"github.com/Bo0mer/cowbull/game/gamefakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,8 +12,8 @@ import (
 
 var _ = Describe("Game", func() {
 
-	var thinker *fakes.FakeThinker
-	var guesser *fakes.FakeGuesser
+	var thinker *gamefakes.FakeThinker
+	var guesser *gamefakes.FakeGuesser
 	var game *Game
 
 	var err error
@@ -27,8 +27,8 @@ var _ = Describe("Game", func() {
 	}
 
 	BeforeEach(func() {
-		thinker = new(fakes.FakeThinker)
-		guesser = new(fakes.FakeGuesser)
+		thinker = new(gamefakes.FakeThinker)
+		guesser = new(gamefakes.FakeGuesser)
 	})
 
 	JustBeforeEach(func() {
