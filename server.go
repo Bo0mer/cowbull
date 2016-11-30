@@ -8,8 +8,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type operation func(map[string]*Client)
-
 // ServerConfig holds configuration for a server.
 type ServerConfig struct {
 	// Path to directory from where to serve content.
