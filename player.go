@@ -35,6 +35,8 @@ type Messenger interface {
 	SendMessage(kind string, data string) error
 }
 
+// RemotePlayer is a player that is away and the only way to communicate
+// with it is via messenger.
 type RemotePlayer struct {
 	m Messenger
 
@@ -46,7 +48,7 @@ type RemotePlayer struct {
 	try    chan cowsbulls // the result of the last try to guess the number
 }
 
-// RemotePlayer creates a player based on a client.
+// NewRemotePlayer creates a player based on a messenger.
 func NewRemotePlayer(m Messenger) *RemotePlayer {
 	p := &RemotePlayer{
 		m:      m,
@@ -118,6 +120,7 @@ func (p *RemotePlayer) Name() string {
 	return p.name
 }
 
+// AnnouncePlayers sends message announcing all players specified.
 func (p *RemotePlayer) AnnouncePlayers(players []PlayerEntry) error {
 	playersBytes, err := json.Marshal(players)
 	if err != nil {
@@ -126,6 +129,7 @@ func (p *RemotePlayer) AnnouncePlayers(players []PlayerEntry) error {
 	return p.m.SendMessage("players", string(playersBytes))
 }
 
+// Think sends a think messages and returns its response.
 func (p *RemotePlayer) Think() (int, error) {
 	if err := p.m.SendMessage("think", ""); err != nil {
 		return 0, err
@@ -134,6 +138,7 @@ func (p *RemotePlayer) Think() (int, error) {
 	return (<-p.digits).Digits, nil
 }
 
+// Guess sends a guess message and returns its response.
 func (p *RemotePlayer) Guess(n int) (string, error) {
 	guessReq := digits{Digits: n}
 	data, err := json.Marshal(&guessReq)
@@ -148,6 +153,7 @@ func (p *RemotePlayer) Guess(n int) (string, error) {
 	return (<-p.number).Number, nil
 }
 
+// Try sends a try message and returns its response.
 func (p *RemotePlayer) Try(guess string) (int, int, error) {
 	tryReq := number{Number: guess}
 	data, err := json.Marshal(&tryReq)
@@ -163,6 +169,7 @@ func (p *RemotePlayer) Try(guess string) (int, int, error) {
 	return try.Cows, try.Bulls, nil
 }
 
+// Tell sends a tell message.
 func (p *RemotePlayer) Tell(number string, cows, bulls int) error {
 	tellReq := cowsbulls{Number: number, Cows: cows, Bulls: bulls}
 	data, err := json.Marshal(&tellReq)
