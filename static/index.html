@@ -1,0 +1,33 @@
+<html>
+    <head>
+<title>Cows & Bulls</title>
+    </head>
+    <body>
+<h1>Cows & Bulls</h1>
+    <div class="settingsDiv">
+        <p>To start your journey enter your settings and click play.</p>
+        <label for="opponentSelect">Opponent</label>
+        <select class=".opponentSelect" id="opponentSelect" label="versus">
+            <option value="ai_thinker">AI thinker</option>
+            <option value="ai_guesser">AI guesser</option>
+            <option value="thinker">Thinker</option>
+            <option value="guesser">Guesser</option>
+        </select>
+        <input class="digitsInput" placeholder="Number of digits" />
+        <input type ="button" class="playButton" value="Play"/>
+        <br/>
+        <p>Connected players:</p>
+        <div class="playersDiv">
+        </div>
+    </div>
+    
+    <div class="gameDiv" style="display: none;">
+        <p>Game in progress ...</p>
+        <div class="gameLogDiv"></div>     
+        <input class="numberInput" placeholder="Enter a guess"/>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/main.js"></script>
+    </body>
+</html>
