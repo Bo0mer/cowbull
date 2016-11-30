@@ -33,7 +33,7 @@ var _ = Describe("Client", func() {
 	})
 
 	AfterEach(func() {
-		c.Close()
+		Expect(c.Close()).To(Succeed())
 	})
 
 	Describe("ID", func() {
@@ -105,60 +105,6 @@ var _ = Describe("Client", func() {
 		})
 	})
 
-	Describe("Close", func() {
-		var err error
-
-		Context("when there is error closing the connection", func() {
-			var expectedErr error
-			BeforeEach(func() {
-				expectedErr = errors.New("kaboom")
-				conn.CloseReturns(expectedErr)
-				c = NewClient(conn)
-
-				err = conn.Close()
-			})
-
-			It("should return an error", func() {
-				Ω(err).Should(HaveOccurred())
-				Ω(err).Should(Equal(expectedErr))
-			})
-		})
-
-		Context("when there is action registered for disconnect", func() {
-			var invoked chan struct{}
-
-			BeforeEach(func() {
-				c = NewClient(conn)
-				invoked = make(chan struct{}, 1)
-				c.OnMessage("disconnect", func(_ string) {
-					invoked <- struct{}{}
-				})
-
-				err = c.Close()
-			})
-
-			It("should have invoked it", func() {
-				Eventually(invoked).Should(Receive())
-			})
-
-			It("should have not returned an error", func() {
-				Ω(err).ShouldNot(HaveOccurred())
-			})
-		})
-
-		Context("when called twice", func() {
-			BeforeEach(func() {
-				c = NewClient(conn)
-				c.Close()
-				c.Close()
-			})
-
-			It("should close the connection only once", func() {
-				Ω(conn.CloseCallCount()).Should(Equal(1))
-			})
-		})
-	})
-
 	Context("with broken connection", func() {
 		var closed chan struct{}
 		var invoked chan struct{}
@@ -209,6 +155,68 @@ var _ = Describe("Client", func() {
 			// first attempt is not a retry, it is just a try.
 			retries := tries - 1
 			Ω(retries).Should(Equal(n))
+		})
+	})
+})
+
+var _ = Describe("Close", func() {
+
+	var conn *cowbullfakes.FakeConn
+	var c *Client
+
+	BeforeEach(func() {
+		conn = new(cowbullfakes.FakeConn)
+		conn.RemoteAddrReturns(fakeNetAddr{})
+	})
+	var err error
+
+	Context("when there is error closing the connection", func() {
+		var expectedErr error
+		BeforeEach(func() {
+			expectedErr = errors.New("kaboom")
+			conn.CloseReturns(expectedErr)
+			c = NewClient(conn)
+
+			err = conn.Close()
+		})
+
+		It("should return an error", func() {
+			Ω(err).Should(HaveOccurred())
+			Ω(err).Should(Equal(expectedErr))
+		})
+	})
+
+	Context("when there is action registered for disconnect", func() {
+		var invoked chan struct{}
+
+		BeforeEach(func() {
+			c = NewClient(conn)
+			invoked = make(chan struct{}, 1)
+			c.OnMessage("disconnect", func(_ string) {
+				invoked <- struct{}{}
+			})
+
+			err = c.Close()
+		})
+
+		It("should have invoked it", func() {
+			Eventually(invoked).Should(Receive())
+		})
+
+		It("should have not returned an error", func() {
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("when called twice", func() {
+		BeforeEach(func() {
+			c = NewClient(conn)
+			Expect(c.Close()).To(Succeed())
+			Expect(c.Close()).To(Succeed())
+		})
+
+		It("should close the connection only once", func() {
+			Ω(conn.CloseCallCount()).Should(Equal(1))
 		})
 	})
 })
