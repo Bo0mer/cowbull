@@ -11,7 +11,9 @@ import (
 //go:generate counterfeiter . Gamer
 
 const (
+	// RoleThinker labels the thinker role.
 	RoleThinker = "thinker"
+	// RoleGuesser labels the guesser role.
 	RoleGuesser = "guesser"
 )
 
