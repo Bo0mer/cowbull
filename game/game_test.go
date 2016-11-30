@@ -100,7 +100,8 @@ var _ = Describe("Game", func() {
 
 					It("should tell the result to the guesser", func() {
 						Ω(guesser.TellCallCount()).Should(Equal(1))
-						argCows, argBulls := guesser.TellArgsForCall(0)
+						nArg, argCows, argBulls := guesser.TellArgsForCall(0)
+						Ω(nArg).Should(Equal(guess))
 						Ω(argCows).Should(Equal(cows))
 						Ω(argBulls).Should(Equal(bulls))
 					})

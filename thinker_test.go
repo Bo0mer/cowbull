@@ -1,4 +1,4 @@
-package game
+package cowbull
 
 import (
 	"strings"
@@ -35,7 +35,7 @@ var _ = Describe("LocalThinker", func() {
 			Entry("ten", 10, 10))
 
 		Context("when perm returns 0 as first element", func() {
-			var thinker *localThinker
+			var thinker *AIThinker
 			var expectedDigits int
 			var actualDigits int
 			var err error
@@ -74,14 +74,14 @@ var _ = Describe("LocalThinker", func() {
 	Describe("Try", func() {
 		var number string
 		var try string
-		var thinker *localThinker
+		var thinker *AIThinker
 		var cows, bulls int
 		var err error
 
 		JustBeforeEach(func() {
 			number = "42"
 			// directly inject the number into thinker
-			thinker = &localThinker{number: number}
+			thinker = &AIThinker{number: number}
 			cows, bulls, err = thinker.Try(try)
 		})
 

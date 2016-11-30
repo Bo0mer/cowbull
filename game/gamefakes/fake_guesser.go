@@ -17,11 +17,12 @@ type FakeGuesser struct {
 		result1 string
 		result2 error
 	}
-	TellStub        func(int, int) error
+	TellStub        func(string, int, int) error
 	tellMutex       sync.RWMutex
 	tellArgsForCall []struct {
-		arg1 int
+		arg1 string
 		arg2 int
+		arg3 int
 	}
 	tellReturns struct {
 		result1 error
@@ -64,16 +65,17 @@ func (fake *FakeGuesser) GuessReturns(result1 string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *FakeGuesser) Tell(arg1 int, arg2 int) error {
+func (fake *FakeGuesser) Tell(arg1 string, arg2 int, arg3 int) error {
 	fake.tellMutex.Lock()
 	fake.tellArgsForCall = append(fake.tellArgsForCall, struct {
-		arg1 int
+		arg1 string
 		arg2 int
-	}{arg1, arg2})
-	fake.recordInvocation("Tell", []interface{}{arg1, arg2})
+		arg3 int
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("Tell", []interface{}{arg1, arg2, arg3})
 	fake.tellMutex.Unlock()
 	if fake.TellStub != nil {
-		return fake.TellStub(arg1, arg2)
+		return fake.TellStub(arg1, arg2, arg3)
 	} else {
 		return fake.tellReturns.result1
 	}
@@ -85,10 +87,10 @@ func (fake *FakeGuesser) TellCallCount() int {
 	return len(fake.tellArgsForCall)
 }
 
-func (fake *FakeGuesser) TellArgsForCall(i int) (int, int) {
+func (fake *FakeGuesser) TellArgsForCall(i int) (string, int, int) {
 	fake.tellMutex.RLock()
 	defer fake.tellMutex.RUnlock()
-	return fake.tellArgsForCall[i].arg1, fake.tellArgsForCall[i].arg2
+	return fake.tellArgsForCall[i].arg1, fake.tellArgsForCall[i].arg2, fake.tellArgsForCall[i].arg3
 }
 
 func (fake *FakeGuesser) TellReturns(result1 error) {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Bo0mer/cowbull"
+	"github.com/Bo0mer/cowbull/game"
 	"github.com/gorilla/websocket"
 )
 
@@ -36,7 +37,9 @@ func main() {
 		}
 
 	}
-	playerHub := cowbull.NewHub(log.New(os.Stdout, "hub: ", 0))
+
+	gamer := gamer{}
+	playerHub := cowbull.NewHub(gamer, log.New(os.Stdout, "hub: ", 0))
 	srv := cowbull.Server(&cowbull.ServerConfig{
 		StaticFilesPath: "./static/",
 		Log:             log.New(os.Stdout, "server: ", 0),
@@ -51,4 +54,10 @@ func main() {
 	if err := http.ListenAndServe(addr, srv); err != nil {
 		log.Fatalf("error serving: %v\n", err)
 	}
+}
+
+type gamer struct{}
+
+func (gamer) Game(t game.Thinker, g game.Guesser) (*game.Game, error) {
+	return game.New(t, g), nil
 }

@@ -11,8 +11,9 @@ import (
 var _ Player = &remotePlayer{}
 
 type cowsbulls struct {
-	Cows  int `json:"cows"`
-	Bulls int `json:"bulls"`
+	Number string `json:"number"`
+	Cows   int    `json:"cows"`
+	Bulls  int    `json:"bulls"`
 }
 
 type digits struct {
@@ -152,8 +153,8 @@ func (p *remotePlayer) Try(guess string) (int, int, error) {
 	return try.Cows, try.Bulls, nil
 }
 
-func (p *remotePlayer) Tell(cows, bulls int) error {
-	tellReq := cowsbulls{Cows: cows, Bulls: bulls}
+func (p *remotePlayer) Tell(number string, cows, bulls int) error {
+	tellReq := cowsbulls{Number: number, Cows: cows, Bulls: bulls}
 	data, err := json.Marshal(&tellReq)
 	if err != nil {
 		return err

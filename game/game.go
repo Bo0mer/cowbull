@@ -20,7 +20,7 @@ type Guesser interface {
 	// Guess should return a guess number consisting of n digits.
 	Guess(n int) (string, error)
 	// Tell should tell the player the result of his guess.
-	Tell(int, int) error
+	Tell(string, int, int) error
 }
 
 // Game represents a cowbull game.
@@ -35,12 +35,6 @@ func New(thinker Thinker, guesser Guesser) *Game {
 		thinker: thinker,
 		guesser: guesser,
 	}
-}
-
-// WithAI creates new game in which the thinker is a robot.
-func WithAI(guesser Guesser, digits int) *Game {
-	localPlayer := LocalThinker(digits)
-	return New(localPlayer, guesser)
 }
 
 // Play plays the game with the players.
@@ -61,7 +55,7 @@ func (g *Game) Play() error {
 			return err
 		}
 
-		if err = g.guesser.Tell(cows, bulls); err != nil {
+		if err = g.guesser.Tell(guess, cows, bulls); err != nil {
 			return err
 		}
 

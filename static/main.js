@@ -20,13 +20,6 @@ $(function() {
         $digitsInput = $('.digitsInput');
         digits = parseInt(cleanInput($digitsInput.val().trim()))
 
-        var opponentName = prompt("Enter name of your opponent");
-        var opponentId = getPlayerId(opponentName);
-        if (opponentId === "") {
-            alert("Player " + opponentName + " not found.");
-            return
-        }
-
         switch ($('#opponentSelect').val()) {
         case "ai_thinker":
             playerRole = "guesser"
@@ -36,7 +29,14 @@ $(function() {
         case "thinker":
             playerRole = "guesser";
             againstAI = false;
-            opponents = [opponentId];
+            opponents = promptForOpponent();
+            break;
+        case "guesser":
+            playerRole = "thinker";
+            againstAI = false;
+            opponents = promptForMultipleOpponents();
+
+            waitsForThink = true;
             break;
         }
 
@@ -48,6 +48,7 @@ $(function() {
             number = cleanInput($('.numberInput').val().trim());
             sendGuess(number);
             $(this).val('');
+            $(this).hide();
         }
     }
 
@@ -55,12 +56,6 @@ $(function() {
         $settingsDiv.fadeOut();
         $gameDiv.show();
 
-        var $numberInput = $('.numberInput');
-        if (playerRole == "guesser") {
-            $numberInput.show();
-        } else {
-            $numberInput.fadeOut();
-        }
     }
 
     function resetGameField() {
@@ -72,10 +67,13 @@ $(function() {
     function showGuessRequest(digitsCount) {
         var logEntry = "The number has " + digitsCount.toString() + " digits.";
         gameLog(logEntry);
+
+        var $numberInput = $('.numberInput');
+        $numberInput.show();
     }
 
-    function showGuessResult(cows, bulls) {
-        var logEntry = "There are " + cows + " cows and " + bulls +" bulls.";
+    function showGuessResult(number, cows, bulls) {
+        var logEntry = "For " + number + " there are " + cows + " cows and " + bulls +" bulls.";
         gameLog(logEntry); 
     }
 
@@ -109,6 +107,22 @@ $(function() {
         return prompt("Please choose your in-game name");
     }
 
+    function promptForOpponent() {
+        var opponentName = prompt("Enter name of your opponent");
+        return getPlayerId(opponentName);
+    }
+
+    function promptForMultipleOpponents() {
+        var opponents = [];
+        opponentNames = prompt("Enter list of player names separated by ',' (comma)");
+        opponentNames = opponentNames.split(",");
+        for (var i = 0; i < opponentNames.length; i++) {
+            var id = getPlayerId(opponentNames[i].trim());
+            opponents.push(id);
+        }
+        return opponents;
+    }
+
     function showGameEnd(won) {
         if (won) {
             alert("You have just WON!!!");
@@ -135,6 +149,7 @@ $(function() {
 
     var socket;
     var inGame = false;
+    var waitsForThink = false;
     var currentNumber;
     var currentNumberDigits;
 
@@ -231,7 +246,7 @@ $(function() {
 
     function handleGuess(data) {
         if (!inGame) {
-            return;
+            initGameField("guesser");
         }
         var guess = JSON.parse(data);
         currentNumberDigits = guess.digits;
@@ -240,12 +255,8 @@ $(function() {
     }
 
     function handleTell(data) {
-        if (!inGame) {
-            return;
-        }
-
         var cowsbulls = JSON.parse(data); 
-        showGuessResult(cowsbulls.cows, cowsbulls.bulls); 
+        showGuessResult(cowsbulls.number, cowsbulls.cows, cowsbulls.bulls); 
 
         if (cowsbulls.bulls === currentNumberDigits) {
             endGame(true);
@@ -253,9 +264,12 @@ $(function() {
     }
 
     function handleThink(data) {
-        if (inGame) {
+        if (inGame && !waitsForThink) {
             return;
         } 
+        if (inGame && waitsForThink) {
+            waitsForThink = false;
+        }
 
         inGame = true;
         initGameField("thinker");

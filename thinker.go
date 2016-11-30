@@ -1,4 +1,4 @@
-package game
+package cowbull
 
 import (
 	"errors"
@@ -7,28 +7,28 @@ import (
 	"strings"
 )
 
-type localThinker struct {
+type AIThinker struct {
 	digits int
 	number string
 
 	perm func(int) []int
 }
 
-func LocalThinker(digits int) *localThinker {
-	return &localThinker{
+func LocalThinker(digits int) *AIThinker {
+	return &AIThinker{
 		digits: digits,
 		perm:   rand.Perm,
 	}
 }
 
-func NewLocalThinker(digits int, perm func(int) []int) *localThinker {
-	return &localThinker{
+func NewLocalThinker(digits int, perm func(int) []int) *AIThinker {
+	return &AIThinker{
 		digits: digits,
 		perm:   perm,
 	}
 }
 
-func (p *localThinker) Think() (int, error) {
+func (p *AIThinker) Think() (int, error) {
 	var err error
 	p.number, err = p.generateNumber()
 	if err != nil {
@@ -37,7 +37,7 @@ func (p *localThinker) Think() (int, error) {
 	return len(p.number), nil
 }
 
-func (p *localThinker) Try(number string) (int, int, error) {
+func (p *AIThinker) Try(number string) (int, int, error) {
 	if len(number) != len(p.number) {
 		return 0, 0, errors.New("local player: try number digit count mismatch")
 	}
@@ -54,7 +54,7 @@ func (p *localThinker) Try(number string) (int, int, error) {
 	return cows, bulls, nil
 }
 
-func (p *localThinker) generateNumber() (string, error) {
+func (p *AIThinker) generateNumber() (string, error) {
 	if p.digits < 1 || p.digits > 10 {
 		return "", fmt.Errorf("invalid digit count %d", p.digits)
 	}
