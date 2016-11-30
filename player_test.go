@@ -58,9 +58,10 @@ var _ = Describe("RemotePlayer", func() {
 	})
 
 	Describe("AnnouncePlayers", func() {
+		var err error
 		BeforeEach(func() {
 			player = NewRemotePlayer(messenger)
-			player.AnnouncePlayers([]PlayerEntry{{ID: "1", Name: "Bob"}})
+			err = player.AnnouncePlayers([]PlayerEntry{{ID: "1", Name: "Bob"}})
 		})
 
 		It("should send a 'players' message", func() {
@@ -68,6 +69,10 @@ var _ = Describe("RemotePlayer", func() {
 			argKind, argData := messenger.SendMessageArgsForCall(0)
 			Expect(argKind).To(Equal("players"))
 			Expect(argData).To(Equal(`[{"id":"1","name":"Bob"}]`))
+		})
+
+		It("should not return an error", func() {
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 
@@ -164,12 +169,13 @@ var _ = Describe("RemotePlayer", func() {
 	Describe("Tell", func() {
 		var number string
 		var cows, bulls int
+		var err error
 		BeforeEach(func() {
 			number = "4201"
 			cows = 2
 			bulls = 2
 			player = NewRemotePlayer(messenger)
-			player.Tell(number, cows, bulls)
+			err = player.Tell(number, cows, bulls)
 		})
 
 		It("should send a 'tell' message", func() {
@@ -178,6 +184,10 @@ var _ = Describe("RemotePlayer", func() {
 			Expect(argKind).To(Equal("tell"))
 			expected := fmt.Sprintf(`{"number":"%s","cows":%d,"bulls":%d}`, number, cows, bulls)
 			Expect(argData).To(Equal(expected))
+		})
+
+		It("should not return an error", func() {
+			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
 
