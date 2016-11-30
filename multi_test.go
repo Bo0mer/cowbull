@@ -23,15 +23,18 @@ var _ = Describe("MultiGuesser", func() {
 
 	Describe("Guess", func() {
 		It("should ask the players to tell in consecutive order", func() {
-			multi.Guess(7)
+			_, err := multi.Guess(7)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(player1.GuessCallCount()).To(Equal(1))
 			Expect(player1.GuessArgsForCall(0)).To(Equal(7))
 
-			multi.Guess(8)
+			_, err = multi.Guess(8)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(player2.GuessCallCount()).To(Equal(1))
 			Expect(player2.GuessArgsForCall(0)).To(Equal(8))
 
-			multi.Guess(9)
+			_, err = multi.Guess(9)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(player1.GuessCallCount()).To(Equal(2))
 			Expect(player1.GuessArgsForCall(1)).To(Equal(9))
 		})
@@ -39,7 +42,8 @@ var _ = Describe("MultiGuesser", func() {
 
 	Describe("Tell", func() {
 		It("should tell all players the guess result", func() {
-			multi.Tell("42", 1, 1)
+			err := multi.Tell("42", 1, 1)
+			Expect(err).ShouldNot(HaveOccurred())
 
 			Expect(player1.TellCallCount()).To(Equal(1))
 			nArg, cowsArg, bullsArg := player1.TellArgsForCall(0)
