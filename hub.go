@@ -123,7 +123,8 @@ func (h *Hub) NewGame(from Player, settings GameSettings) (*game.Game, error) {
 	case RoleThinker:
 		thinker = from
 		if settings.AI {
-			panic("not implemented")
+			guesser = LocalGuesser(settings.Digits)
+			break
 		}
 		opponents := h.playersWithIDs(settings.Opponents)
 		// invalid input
