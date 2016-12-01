@@ -24,7 +24,8 @@ type ServerConfig struct {
 	Hub *Hub
 }
 
-type server struct {
+// Server implements a cowbull game server.
+type Server struct {
 	mux     http.Handler
 	websock *websocket.Upgrader
 	log     *log.Logger
@@ -34,13 +35,13 @@ type server struct {
 	fs http.Handler
 }
 
-// Server creates a new server.
+// NewServer creates a new server.
 // After once initialized the config object should not be modified.
-func Server(cfg *ServerConfig) *server {
+func NewServer(cfg *ServerConfig) *Server {
 	fs := http.FileServer(http.Dir(cfg.StaticFilesPath))
 	mux := http.NewServeMux()
 
-	s := &server{
+	s := &Server{
 		mux:     mux,
 		websock: cfg.Upgrader,
 		log:     cfg.Log,
@@ -54,13 +55,14 @@ func Server(cfg *ServerConfig) *server {
 	return s
 }
 
-func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+// ServeHTTP serves HTTP requests.
+func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	s.mux.ServeHTTP(w, req)
 }
 
 // upgrade upgrades an HTTP connection to a WebSocket connection and
 // forks off a client of the WebSocket connection.
-func (s *server) upgrade(w http.ResponseWriter, req *http.Request) {
+func (s *Server) upgrade(w http.ResponseWriter, req *http.Request) {
 	conn, err := s.websock.Upgrade(w, req, nil)
 	if err != nil {
 		s.log.Printf("error upgrading to websocket conn: %v\n", err)
