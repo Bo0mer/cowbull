@@ -40,7 +40,7 @@ func main() {
 
 	gamer := gamer{}
 	playerHub := cowbull.NewHub(gamer, log.New(os.Stdout, "hub: ", 0))
-	srv := cowbull.Server(&cowbull.ServerConfig{
+	srv := cowbull.NewServer(&cowbull.ServerConfig{
 		StaticFilesPath: "./static/",
 		Log:             log.New(os.Stdout, "server: ", 0),
 		Hub:             playerHub,
