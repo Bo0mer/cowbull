@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -70,7 +71,7 @@ func (s *Server) upgrade(w http.ResponseWriter, req *http.Request) {
 	}
 
 	c := NewClient(conn)
-	player := NewRemotePlayer(c)
+	player := NewRemotePlayer(c, 60*time.Second)
 	c.OnMessage("connect", func(_ string) {
 		s.log.Printf("client connected: %s\n", c.ID())
 		s.hub.Add(player)

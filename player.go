@@ -2,8 +2,10 @@ package cowbull
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"sync"
+	"time"
 )
 
 //go:generate counterfeiter . Messenger
@@ -38,7 +40,8 @@ type Messenger interface {
 // RemotePlayer is a player that is away and the only way to communicate
 // with it is via messenger.
 type RemotePlayer struct {
-	m Messenger
+	m           Messenger
+	waitTimeout time.Duration
 
 	mu   sync.RWMutex // guards
 	name string
@@ -49,12 +52,13 @@ type RemotePlayer struct {
 }
 
 // NewRemotePlayer creates a player based on a messenger.
-func NewRemotePlayer(m Messenger) *RemotePlayer {
+func NewRemotePlayer(m Messenger, waitTimeout time.Duration) *RemotePlayer {
 	p := &RemotePlayer{
-		m:      m,
-		digits: make(chan digits),
-		number: make(chan number),
-		try:    make(chan cowsbulls),
+		m:           m,
+		waitTimeout: waitTimeout,
+		digits:      make(chan digits),
+		number:      make(chan number),
+		try:         make(chan cowsbulls),
 	}
 
 	m.OnMessage("name", func(data string) {
@@ -135,7 +139,12 @@ func (p *RemotePlayer) Think() (int, error) {
 		return 0, err
 	}
 
-	return (<-p.digits).Digits, nil
+	select {
+	case <-time.Tick(p.waitTimeout):
+		return 0, errors.New("remoteplayer: think timed out")
+	case d := <-p.digits:
+		return d.Digits, nil
+	}
 }
 
 // Guess sends a guess message and returns its response.
@@ -150,7 +159,12 @@ func (p *RemotePlayer) Guess(n int) (string, error) {
 		return "", err
 	}
 
-	return (<-p.number).Number, nil
+	select {
+	case <-time.Tick(p.waitTimeout):
+		return "", errors.New("remoteplayer: guess timed out")
+	case res := <-p.number:
+		return res.Number, nil
+	}
 }
 
 // Try sends a try message and returns its response.
@@ -165,8 +179,12 @@ func (p *RemotePlayer) Try(guess string) (int, int, error) {
 		return 0, 0, err
 	}
 
-	try := <-p.try
-	return try.Cows, try.Bulls, nil
+	select {
+	case <-time.Tick(p.waitTimeout):
+		return 0, 0, errors.New("remoteplayer: try timed out")
+	case res := <-p.try:
+		return res.Cows, res.Bulls, nil
+	}
 }
 
 // Tell sends a tell message.
