@@ -40,7 +40,7 @@ var _ = Describe("AIGuesser", func() {
 					break
 				}
 				c, b := computeCowsBulls(number, guess)
-				g.Tell(guess, c, b)
+				Ω(g.Tell(guess, c, b)).Should(Succeed())
 			}
 			Ω(i).Should(BeNumerically("<", 8))
 		})
